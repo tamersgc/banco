@@ -1,6 +1,6 @@
 const { randomUUID } = require("crypto");
 
-const Banco = require('./banco2')
+const Banco = require('./banco')
 
 const express = require("express")
 
@@ -72,12 +72,14 @@ app.delete("/projetos/:id", (request, response) => {
 
     const { id } = request.params
 
-    const index = projects.findIndex(data => data.id == id)
+    banco.remover(id)
 
-    if (index < 0)
-        return response.status(400).json({ message: "Projeto not found" })
+    //    const index = projects.findIndex(data => data.id == id)
 
-    projects.splice(index, 1)
+    //  if (index < 0)
+    //    return response.status(400).json({ message: "Projeto not found" })
+
+    //projects.splice(index, 1)
 
     return response.json()
 })
