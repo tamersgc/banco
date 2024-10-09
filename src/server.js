@@ -4,9 +4,15 @@ const Banco = require('./banco')
 
 const express = require("express")
 
+//So para o front
+const cors =  require("cors")
+
 const PORT = 3333;
 
 const app = express()
+
+////So para o front
+app.use(cors())
 
 app.use(express.json())
 
