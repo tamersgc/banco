@@ -18,74 +18,70 @@ app.use(express.json())
 
 const banco = new Banco()
 
-app.get("/projetos", async (request, response) => {
+app.get("/alunos", async (request, response) => {
 
     const { id } = request.query
 
-    const projects = await banco.listar()
-
-    console.log(projects)
+    const alunos = await banco.listar()
 
     if (id) {
-        const project = projects.filter(data => data.id == id)
+        const aluno = alunos.filter(data => data.id == id)
 
-        return response.json(project)
+        return response.json(aluno)
     }
 
-    return response.json(projects)
+    return response.json(alunos)
 })
 
-app.post("/projetos", (request, response) => {
+app.post("/alunos", (request, response) => {
 
-    const { title, description } = request.body
+    const { nome, email } = request.body
 
     const uuid = randomUUID()
 
-    const project = {
+    const aluno = {
         uuid,
-        title,
-        description
+        nome,
+        email
     }
 
-    banco.inserir(project)
+    banco.inserir(aluno)
 
-    return response.json(project)
+    return response.json(aluno)
 })
 
-app.put("/projetos/:id", (request, response) => {
+app.put("/alunos/:id", async (request, response) => {
 
     const { id } = request.params
 
-    const { title, description } = request.body
+    const { nome, email } = request.body
 
-    const index = projects.findIndex(data => data.id == id)
-
-    if (index < 0)
-        return response.status(400).json({ message: "Projeto not found" })
-
-    const project = {
+    const aluno = {
         id,
-        title,
-        description
+        nome,
+        email
     }
 
-    projects[index] = project
+    const result = await banco.buscar(id)
+
+    if(!result)
+        return response.status(400).json({ message: "Aluno not found" })
+
+    banco.atualizar(aluno)
 
     return response.json()
 })
 
-app.delete("/projetos/:id", (request, response) => {
+app.delete("/alunos/:id", async (request, response) => {
 
     const { id } = request.params
 
+    const aluno = await banco.buscar(id)
+
+    if(!aluno)
+        return response.status(400).json({ message: "Aluno not found" })
+
     banco.remover(id)
-
-    //    const index = projects.findIndex(data => data.id == id)
-
-    //  if (index < 0)
-    //    return response.status(400).json({ message: "Projeto not found" })
-
-    //projects.splice(index, 1)
 
     return response.json()
 })

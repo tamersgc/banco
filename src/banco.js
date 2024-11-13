@@ -4,13 +4,10 @@ const sqlite = require('sqlite')
 class Banco {
 
     constructor() {
-        // this.banco = new sqlite3.Database('./database.db');
         this.criarBanco();
     }
 
     async sqliteConnection() {
-        // const database = sqlite3.open('./database.db')
-
         const database = await sqlite.open({
             filename: "database.db",
             driver: sqlite3.Database
@@ -22,21 +19,29 @@ class Banco {
     async criarBanco() {
         const banco = await this.sqliteConnection()
         const createAlunos = `
-           CREATE TABLE IF NOT EXISTS projetos (
+           CREATE TABLE IF NOT EXISTS alunos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title VARCHAR,
-            description VARCHAR,
+            nome VARCHAR,
+            email VARCHAR,
             uuid VARCHAR
         )`;
         banco.exec(createAlunos)
     }
 
-    async inserir(project) {
-        const { uuid, title, description } = project
+    async inserir(aluno) {
+        const { uuid, nome, email } = aluno
 
         const banco = await this.sqliteConnection()
 
-        banco.run("INSERT INTO projetos (title,description,uuid) VALUES (? ,? ,?)", [title, description, uuid])
+        banco.run("INSERT INTO alunos (nome,email,uuid) VALUES (? ,? ,?)", [nome, email, uuid])
+    }
+
+    async atualizar(aluno) {
+        const { id, nome, email } = aluno
+
+        const banco = await this.sqliteConnection()
+
+        banco.run("UPDATE alunos SET nome=?, email=? WHERE id=?", [nome, email, id])
     }
 
     async remover(id) {
@@ -45,7 +50,7 @@ class Banco {
 
         const banco = await this.sqliteConnection()
 
-        banco.run("DELETE FROM projetos WHERE id=?", [id])
+        banco.run("DELETE FROM alunos WHERE id=?", [id])
 
     }
 
@@ -53,9 +58,18 @@ class Banco {
 
         const banco = await this.sqliteConnection()
 
-        const alunos = await banco.all("SELECT * FROM projetos")
+        const alunos = await banco.all("SELECT * FROM alunos")
 
         return alunos
+    }
+
+    async buscar(id) {
+
+        const banco = await this.sqliteConnection()
+
+        const aluno = await banco.get("SELECT * FROM alunos WHERE id=?",id)
+
+        return aluno
     }
 
 }
